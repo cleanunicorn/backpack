@@ -1,4 +1,5 @@
 import UrlForm from "./components/UrlForm";
+import LinkList from "./components/LinkList";
 
 export default function Home() {
   return (
@@ -11,6 +12,9 @@ export default function Home() {
           </h2>
           <UrlForm />
         </div>
+        
+        {/* Links List Section */}
+        <LinkList />
       </main>
     </div>
   );
