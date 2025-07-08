@@ -3,7 +3,11 @@
 import { useState, useEffect } from 'react';
 import { db } from '../lib/db';
 
-export default function UrlForm() {
+interface UrlFormProps {
+  onLinkSaved?: () => void;
+}
+
+export default function UrlForm({ onLinkSaved }: UrlFormProps) {
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +44,9 @@ export default function UrlForm() {
       setMessage({ type: 'success', text: 'Link saved successfully!' });
       setUrl('');
       setTitle('');
+      
+      // Call the callback to refresh the link list
+      onLinkSaved?.();
     } catch (error) {
       console.error('Error saving link:', error);
       setMessage({ type: 'error', text: 'Error saving link. Please try again.' });

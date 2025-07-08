@@ -1,9 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { db, Link } from '../lib/db';
 
-export default function LinkList() {
+export interface LinkListRef {
+  refreshLinks: () => void;
+}
+
+const LinkList = forwardRef<LinkListRef>((_, ref) => {
   const [links, setLinks] = useState<Link[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -23,6 +27,10 @@ export default function LinkList() {
       setIsLoading(false);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    refreshLinks: loadLinks
+  }));
 
   const handleDelete = async (id: number) => {
     try {
@@ -100,4 +108,8 @@ export default function LinkList() {
       </div>
     </div>
   );
-}
+});
+
+LinkList.displayName = 'LinkList';
+
+export default LinkList;

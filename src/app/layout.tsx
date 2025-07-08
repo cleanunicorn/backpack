@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "Backpack is a platform for creating and sharing your link collection.",
   manifest: "/manifest.json",
   other: {
-    "apple-mobile-web-app-capable": "yes",
+    "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
     "apple-mobile-web-app-title": "Backpack",
   },
