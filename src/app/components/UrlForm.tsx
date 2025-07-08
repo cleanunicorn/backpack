@@ -1,21 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { db } from '../lib/db';
 
 export default function UrlForm() {
   const [url, setUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    db.init().catch(console.error);
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle the URL save logic here
-    console.log('Saving URL:', url);
-    // You can add your save logic here
-    setUrl(''); // Clear the form after submission
+    setIsLoading(true);
+    
+    try {
+      const linkTitle = title.trim() || new URL(url).hostname;
+      
+      await db.saveLink({
+        title: linkTitle,
+        url: url,
+        timestamp: Date.now(),
+        synced: false,
+        visited: false
+      });
+      
+      console.log('Link saved successfully');
+      setUrl('');
+      setTitle('');
+    } catch (error) {
+      console.error('Error saving link:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Title (optional)
+          </label>
+          <input
+            type="text"
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Link title"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+          />
+        </div>
         <div>
           <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Enter URL
@@ -27,14 +64,15 @@ export default function UrlForm() {
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://example.com"
             required
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
           />
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          disabled={isLoading}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Save
+          {isLoading ? 'Saving...' : 'Save'}
         </button>
       </form>
     </div>

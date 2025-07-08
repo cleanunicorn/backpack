@@ -6,8 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Link Saver Progressive Web App (PWA) that allows users to save and manage links locally with offline support. The project currently has two separate implementations that need to be integrated:
 
-1. **Traditional PWA** - A standalone HTML/JS implementation with service worker and IndexedDB
-2. **Next.js App** - A modern React framework setup that hasn't been connected to the PWA features yet
+1. **Next.js App** - A modern React framework setup that hasn't been connected to the PWA features yet
 
 ## Development Commands
 
@@ -48,15 +47,8 @@ The project has two disconnected parts:
 - **Link Management**: Save, view, and delete links with custom titles
 
 ### Key Technical Details
-- The manifest.json configures the app as "Link Saver PWA" with share target capability
-- Service worker implements cache-first strategy (cache version: my-pwa-v1)
-- IndexedDB database: "LinkSaverDB" with "links" object store
+- The manifest.json configures the app as "Backpack" with share target capability
+- Service worker implements cache-first strategy (cache version: backpack-v1)
+- IndexedDB database: "BackPackDB" with "links" object store
 - Links have: id, title, url, timestamp, synced, visited fields
-- Share parameters: title, text, url (received via GET params)
-
-## Important Notes
-
-- The static PWA and Next.js app are not integrated - they run on different ports
-- To test the full PWA functionality, use `python3 serve.py` and visit http://localhost:8000
-- The service worker in the static version references files that don't exist in Next.js
-- Future work should integrate PWA features into Next.js using next-pwa or similar
+- Share parameters: url (received via GET params)
