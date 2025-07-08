@@ -74,6 +74,20 @@ class BackpackDB {
       request.onsuccess = () => resolve();
     });
   }
+
+  async linkExists(url: string): Promise<boolean> {
+    if (!this.db) throw new Error('Database not initialized');
+    
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.storeName], 'readonly');
+      const store = transaction.objectStore(this.storeName);
+      const index = store.index('url');
+      const request = index.get(url);
+      
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(!!request.result);
+    });
+  }
 }
 
 export const db = new BackpackDB();

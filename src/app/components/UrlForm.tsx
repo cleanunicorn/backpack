@@ -7,6 +7,7 @@ export default function UrlForm() {
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     db.init().catch(console.error);
@@ -15,10 +16,19 @@ export default function UrlForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+    setMessage(null);
+
     try {
+      // Check if URL already exists
+      const exists = await db.linkExists(url);
+      if (exists) {
+        setMessage({ type: 'error', text: 'This link already exists in your collection' });
+        setIsLoading(false);
+        return;
+      }
+
       const linkTitle = title.trim() || new URL(url).hostname;
-      
+
       await db.saveLink({
         title: linkTitle,
         url: url,
@@ -26,12 +36,13 @@ export default function UrlForm() {
         synced: false,
         visited: false
       });
-      
-      console.log('Link saved successfully');
+
+      setMessage({ type: 'success', text: 'Link saved successfully!' });
       setUrl('');
       setTitle('');
     } catch (error) {
       console.error('Error saving link:', error);
+      setMessage({ type: 'error', text: 'Error saving link. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -39,6 +50,15 @@ export default function UrlForm() {
 
   return (
     <div className="w-full max-w-md mx-auto">
+      {message && (
+        <div className={`mb-4 p-3 rounded-md ${
+          message.type === 'success'
+            ? 'bg-green-100 border border-green-400 text-green-700'
+            : 'bg-red-100 border border-red-400 text-red-700'
+        }`}>
+          {message.text}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -77,4 +97,4 @@ export default function UrlForm() {
       </form>
     </div>
   );
-} 
+}
